@@ -1,7 +1,7 @@
 /* global vis, tinycolor, brothers */
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "draw" }] */
-var network = null;
 
+var network = null;
 function destroy() {
   if (network !== null) {
     network.destroy();

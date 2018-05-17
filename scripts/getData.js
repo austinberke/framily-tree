@@ -1,17 +1,22 @@
-var gsjson = require('google-spreadsheet-to-json');
-var fs = require('fs');
+var scraper = require('table-scraper')
+var brothers = []
+scraper
+  .get('https://docs.google.com/spreadsheets/d/'+spreadsheetID+'/htmlview')
+  .then(function(tableData) {
+    tableData = tableData[0]
+    var keys = Object.values(tableData[0]) // column headers
+    tableData.splice(0,2) // remove top two rows
 
-gsjson({
-  spreadsheetId: '1h6dVJKtETWX3Kr9PT6EaLu0gGavdi8Gnj4IlX155pfY',
-})
-.then(function (result) {
-  var str = 'var brothers = ' + JSON.stringify(result, undefined, 2) + ';\n';
-  fs.writeFileSync('relations.js', str);
-})
-.catch(function (err) {
-  console.error('Something went wrong');
-  console.log(err.message);
-  console.log(err.stack);
-  process.exit(1);
-});
+    // transform JSON labels
+    tableData.forEach((brother) => {
+      var i = 0;
+      var newBrother = {};
+      for (var value in brother) {
+        newBrother[keys[i]] = brother[value] == "TRUE" ? true : brother[value];
+        i++;
+      }
+      brothers.push(newBrother)
+    });
 
+    var str = 'var brothers = ' + JSON.stringify(brothers, undefined, 2) + ';\n';
+  });
